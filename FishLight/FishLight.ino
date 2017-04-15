@@ -1,6 +1,7 @@
   /*
    * NodeMCU Finnex 24/7 Controller
    * An IR LED must be connected to ESP8266 pin D2.
+   * Button/Switch connected to ESP8266 pin D3 pulled low with 10k resistor.
    */
   
   #include <ESP8266WiFi.h>
@@ -179,7 +180,7 @@
   void setup(void){
     irsend.begin();
     
-    Serial.begin(9600);
+    //Serial.begin(9600);
     pinMode(TRIGGER_PIN, INPUT);
     if ( digitalRead(TRIGGER_PIN) == HIGH ) {
       WiFiManager wifiManager;
@@ -189,9 +190,11 @@
       WiFiManager wifiManager;
       wifiManager.autoConnect();
     }
+    //Serial.print("IP address: ");
+    //Serial.println(WiFi.localIP());
     
     if (mdns.begin("esp8266", WiFi.localIP())) {
-      Serial.println("MDNS responder started");
+      //Serial.println("MDNS responder started");
     }
     
     server.on("/", handleRoot);
@@ -204,7 +207,7 @@
     server.onNotFound(handleNotFound);
     
     server.begin();
-    Serial.println("HTTP server started");
+    //Serial.println("HTTP server started");
   }
    
   void loop(void){
