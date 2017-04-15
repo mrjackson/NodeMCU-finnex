@@ -1,7 +1,6 @@
   /*
-   * IRremoteESP8266: IRServer - demonstrates sending IR codes controlled from a webserver
-   * An IR LED must be connected to ESP8266 pin 0.
-   * Version 0.1 June, 2015
+   * NodeMCU Finnex 24/7 Controller
+   * An IR LED must be connected to ESP8266 pin D2.
    */
   
   #include <ESP8266WiFi.h>
@@ -9,9 +8,11 @@
   #include <ESP8266WebServer.h>
   #include <ESP8266mDNS.h>
   #include <IRremoteESP8266.h>
-   
-  const char* ssid = "wifi";
-  const char* password = "1234";
+  #include <WiFiManager.h> //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
+  #include <DNSServer.h> //Local DNS Server used for redirecting all requests to the configuration portal
+  
+  #define TRIGGER_PIN 0
+    
   MDNSResponder mdns;
   
   ESP8266WebServer server(80);
@@ -179,19 +180,15 @@
     irsend.begin();
     
     Serial.begin(9600);
-    WiFi.begin(ssid, password);
-    Serial.println("");
-  
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
+    pinMode(TRIGGER_PIN, INPUT);
+    if ( digitalRead(TRIGGER_PIN) == HIGH ) {
+      WiFiManager wifiManager;
+      //wifiManager.startConfigPortal("OnDemandAP");
+      wifiManager.resetSettings();
+    } else {
+      WiFiManager wifiManager;
+      wifiManager.autoConnect();
     }
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(ssid);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
     
     if (mdns.begin("esp8266", WiFi.localIP())) {
       Serial.println("MDNS responder started");
